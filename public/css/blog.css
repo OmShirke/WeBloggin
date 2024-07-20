@@ -44,3 +44,21 @@
     font-size: 40px;
     margin-top: 80px;
 }
+
+.like-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.like-button, .dislike-button {
+    width: 24px; /* Adjust the size as needed */
+    height: 24px; /* Adjust the size as needed */
+}
+
+.like-count, .dislike-count {
+    font-size: 16px;
+    color: #333;
+}
+
