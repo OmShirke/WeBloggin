@@ -1,15 +1,3 @@
-let blogId = decodeURI(location.pathname.split("/").pop());
-
-let docRef = db.collection("blogs").doc(blogId);
-
-docRef.get().then((doc) => {
-  if (doc.exists) {
-    setupBlog(doc.data());
-  } else {
-    location.replace("/");
-  }
-});
-
 const setupBlog = (data) => {
   const banner = document.querySelector(".banner");
   const blogTitle = document.querySelector(".title");
@@ -52,8 +40,68 @@ const setupBlog = (data) => {
   dislikeButton.addEventListener("click", () => {
     handleLikeDislike(blogId, likeCount, dislikeCount, "dislike");
   });
+
+  // Setup comments
+  setupComments(blogId);
 };
 
+const setupComments = (blogId) => {
+  const commentSection = document.querySelector(".comment-section");
+  const commentList = document.querySelector(".comment-list");
+  const commentForm = document.querySelector(".comment-form");
+  const commentInput = document.querySelector(".comment-input");
+
+  // Check if the required elements are found
+  if (!commentSection || !commentList || !commentForm || !commentInput) {
+    console.error("One or more comment elements not found");
+    return;
+  }
+
+  // Fetch and display comments
+  db.collection("blogs")
+    .doc(blogId)
+    .collection("comments")
+    .orderBy("timestamp", "asc")
+    .onSnapshot((snapshot) => {
+      commentList.innerHTML = ""; // Clear existing comments
+      snapshot.forEach((doc) => {
+        const comment = doc.data();
+        const commentElement = document.createElement("div");
+        commentElement.classList.add("comment");
+        commentElement.innerHTML = `
+          <p class="comment-text">${comment.text}</p>
+          <p class="comment-timestamp">${new Date(
+            comment.timestamp.toDate()
+          ).toLocaleString()}</p>
+        `;
+        commentList.appendChild(commentElement);
+      });
+    });
+
+  // Add event listener for comment submission
+  commentForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const commentText = commentInput.value.trim();
+
+    if (commentText) {
+      db.collection("blogs")
+        .doc(blogId)
+        .collection("comments")
+        .add({
+          text: commentText,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        })
+        .then(() => {
+          commentInput.value = ""; // Clear input field
+        })
+        .catch((error) => {
+          console.error("Error adding comment: ", error);
+        });
+    }
+  });
+};
+
+// Example function to add article content
 const addArticle = (ele, data) => {
   data = data.split("\n").filter((item) => item.length);
 
@@ -87,6 +135,7 @@ const addArticle = (ele, data) => {
   });
 };
 
+// Example function to handle likes and dislikes
 const handleLikeDislike = async (
   blogId,
   likeCountElement,
@@ -158,3 +207,15 @@ const handleLikeDislike = async (
     dislikeCountElement.textContent = `${initialData.dislikes} dislikes`;
   }
 };
+
+// Example: Get blogId and setup blog
+let blogId = decodeURI(location.pathname.split("/").pop());
+let docRef = db.collection("blogs").doc(blogId);
+
+docRef.get().then((doc) => {
+  if (doc.exists) {
+    setupBlog(doc.data());
+  } else {
+    location.replace("/");
+  }
+});

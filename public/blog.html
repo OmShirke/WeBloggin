@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/home.css" />
     <link rel="stylesheet" href="css/editor.css" />
     <link rel="stylesheet" href="css/blog.css" />
+    <link rel="stylesheet" href="css/comment.css" />
   </head>
   <body>
     <nav class="navbar">
@@ -40,6 +41,20 @@
           style="cursor: pointer"
         />
         <span class="dislike-count">0 dislikes</span>
+      </div>
+
+      <!-- Comments Section -->
+      <div class="comment-section">
+        <h2>Comments</h2>
+        <div class="comment-list"></div>
+        <form class="comment-form">
+          <textarea
+            class="comment-input"
+            placeholder="Add a comment..."
+            required
+          ></textarea>
+          <button type="submit" class="comment-submit">Submit</button>
+        </form>
       </div>
     </div>
 
